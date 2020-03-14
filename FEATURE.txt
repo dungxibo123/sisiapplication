@@ -1,0 +1,18 @@
+BASIC FEATURE:
+- HELP (of course)
+
+FOR DELEGATES:
+- Identify country representation (set nicknames, and role to delegates
+- Send private message through dels
+- Asked for speech
+
+FOR CHAIRS:
+- Identify CHAIRS ROLE.
+- Set name for specific committee (different server)
+- Mute/Unmute a Delegate
+
+//bot permission
+1070472369
+
+//SCOPES
+https://discordapp.com/api/oauth2/authorize?client_id=688322041836732568&permissions=1070275761&scope=bot
