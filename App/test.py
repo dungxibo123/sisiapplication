@@ -110,7 +110,7 @@ async def on_reaction_add(reaction, user):
     del_Nums = len(DEL.members)
     #print('numbers of del: {}'.format(del_Nums))
 
-    global voteNo,voteYes,voting_Count, whiteVote
+    global voteNo,voteYes,voting_Count, whiteVote,raiseList
 
     #print(messageNeedToVote, str(reaction.emoji))
     #print(str(reaction.emoji) == '👍') 
@@ -140,7 +140,7 @@ async def on_reaction_remove(reaction,user):
         if i.name == '@delegate': CHAIR = i
     #print('numbers of del: {}'.format(del_Nums))
 
-    global voteNo,voteYes,voting_Count, whiteVote
+    global voteNo,voteYes,voting_Count, whiteVote, raiseList
 
     #print(messageNeedToVote, str(reaction.emoji))
     #print(str(reaction.emoji) == '👍') 
