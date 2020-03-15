@@ -1,36 +1,44 @@
 import discord
-token = 'Njg4MzIyMDQxODM2NzMyNTY4.XmyqgQ.tkA-imK5DXuX9OAhsRw8nEqxuMY'
+token = 'Njg4MzIyMDQxODM2NzMyNTY4.Xm3lxA.pDaNSl5ImMOtl-lyM_TpXI0r3Mw'
 
 '''class MyClient inherit discord.Client create a connection to Bot and we
 can easily use Python to send command through discord Server'''
 bot = discord.Client()
 HPC = 688332663098048532
 
-COUNTRIES = ['VIETNAM', 'IRAG']
+COUNTRIES = ['VIETNAM', 'IRAQ']
 
 def validCountry(country):
     if COUNTRIES.count(country) > 0: return True
     return False
 
-
+def setRegisterationResquest(message,country,role):
+    pass
 @bot.event
 async def on_message(message):
-    mess = message.content
-    roleList = message.guild.roles
-    DEL = None
-#   CHAIR = None
-    for i in roleList:
-        if i.name == '@delegate': DEL = i
+
+    mess = message.content  
     if mess.startswith('$'):
         if mess.startswith('$regis'):
-            country = mess.split(' ')[1].upper()
-            if validCountry(country):
-                #setNickname, role as delegate
-                member = message.author
-                await member.edit(nick = country,roles = [DEL], reason = None)
+            try:
+                roleList = message.guild.roles
+                DEL = None
+                CHAIR = None
+                for i in roleList:
+                    if i.name == '@delegate': DEL = i
+                country = mess.split(' ')[1].upper()
+                if validCountry(country):
+                    member = message.author
+                    if member.roles.count(DEL) > 0:
+                        await message.channel.send('UNVALID ACTIVITY\n{} have already register as {}'.format(member.name,member.nick))
+                    else:
+                        await member.edit(nick = country,roles = [DEL], reason = None)
+                        await message.channel.send('Succesfully registered as {}'.format(country))
+                        
 
-            else:
-                pass
+            except Exception as e:
+                await message.channel.send('Invalid Country or Invalid Guild\'s Input')
+                raise e
                 #send message, invalid country
         elif mess.startswith('$raise'):
             #gửi cho chair private kêu rằng thằng ni muốn nói cái gì đó :V
