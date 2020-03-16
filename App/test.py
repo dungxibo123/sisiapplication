@@ -1,13 +1,14 @@
 import discord
-from time import sleep
-token = 'Njg4MzIyMDQxODM2NzMyNTY4.Xm3lxA.pDaNSl5ImMOtl-lyM_TpXI0r3Mw'
+import asyncio
 
+token = 'Njg4MzIyMDQxODM2NzMyNTY4.Xm87hA.QkYgsyYUGQ3dsxkCj9r1CggbItw'
+#Njg4MzIyMDQxODM2NzMyNTY4.Xm87hA.QkYgsyYUGQ3dsxkCj9r1CggbItw
 '''class MyClient inherit discord.Client create a connection to Bot and we
 can easily use Python to send command through discord Server'''
 bot = discord.Client()
 HPC = 688332663098048532
 
-COUNTRIES = ['VIETNAM', 'IRAQ']
+COUNTRIES = ['VIETNAM', 'IRAQ'] 
 
 
 ##############################
@@ -20,8 +21,18 @@ messageNeedToVote = None     #
 
 ##############################
 raiseList = []               #
-raiseMessage = None           #
+raiseMessage = None          #
 ##############################
+
+
+'''roll call box'''
+##############################
+rollCallMessage = None       #
+memberNeedtoReply = None     #
+isReplyTheRollCall = False   #
+##############################
+
+
 def validCountry(country):
     if COUNTRIES.count(country) > 0: return True
     return False
@@ -32,10 +43,11 @@ def setRegisterationResquest(message,country,role):
 
 @bot.event
 async def on_ready():
-    print('Ok connected ')
+    print('Ok connected')
 
 @bot.event
 async def on_message(message):
+    print(message.content   )
     global voting_Count,voteNo,voteYes,messageNeedToVote
     mess = message.content  
     roleList = message.guild.roles
@@ -68,39 +80,100 @@ async def on_message(message):
         ######################################################################################
         elif mess.startswith('$startraise') and message.author.roles.count(CHAIR) > 0:
             print('Update message to raising hand')
+            global raiseList
+            raiseList = []
             time = 30
             try:
                 time = float(mess.split(' ')[1])
+                await message.channel.send('You got {} seconds to raise your hand by reacting 👍 to $startraise message', time)
             except Exception as e:
-                await message.channel.send('Error with time, automatic time is 15 seconds for voting stuff')
-                time = 30
+                await message.channel.send('Error with time, automatic time is 15 seconds to raise your hand by reacting 👍 to $startraise message')
+                time = 15
             global raiseMessage
             raiseMessage = message
-            sleep(time)
+            await asyncio.sleep(time)
             notification = 'Numbers of Delegates want to raise hand: {}'.format(len(raiseList))
             for i in raiseList:
-                notification += '\n{}'.format(i.nick)
+                notification += '\n{}'.format(i.mention)
             await message.channel.send(notification)
             
         ######################################################################################
         elif mess.startswith('$startvote') and message.author.roles.count(CHAIR) > 0:
             voteYes = 0
             voteNo = 0
+            whiteVote = 0
             voting_Count = 0
-            
             messageNeedToVote = message
             print('Update new message that need to vote')
+            try:
+                time = float(mess.split(' ')[1])
+            except Exception as e:
+                await message.channel.send('Error with time, automatic time is 20 seconds for voting stuff')
+                time = 20
+            await asyncio.sleep(time)
+            await message.channel.send('Numbers of agree: {}\nNumbes of disagree: {}\nNumbers of white-vote: {}\nUnvoted: {}'.format(voteYes,voteNo,whiteVote,del_Nums - voteYes - voteNo - whiteVote))
             #đặt lại số lượng người biểu quyết
         ######################################################################################
-        elif mess.startswith('$send'):
-            #$send <message> to <country>
-            #gửi private message cho thằng quỷ <country>
-            pass
+        elif mess.startswith('$rollcall') and message.author.roles.count(CHAIR) > 0:
+            global memberNeedtoReply,rollCallMessage, isReplyTheRollCall
+            roleList = message.guild.roles
+            DEL = None
+            CHAIR = None
+            absentList = []
+            onlineList = []
+            for i in roleList:
+                if i.name == '@delegate': DEL = i
+                if i.name == '@chair': CHAIR = i
+            delList = DEL.members
+            chairList = CHAIR.members
+            for i in delList:
+                memberNeedtoReply = i
+                await message.channel.send('$call {}. You have 5 seconds to react 👍 on this message'.format(i.mention))
+                await asyncio.sleep(5)
+                if isReplyTheRollCall:
+                    onlineList.append(i)
+                else:
+                    absentList.append(i)
+                isReplyTheRollCall = False
+   
+            roll = 'Absent delegate(s):'
+            for i in absentList: roll += '\n{}'.format(i.mention)
+            roll+='\nOnline delegate(s):'
+            for i in onlineList: roll += '\n{}'.format(i.mention)
+            print(roll)
+            await message.channel.send(roll)
+        elif mess.startswith('$call'):
+            rollCallMessage = message
+            print('\n\n\n\nrollcall messageeeeeeeeeeeeeeeee changed:\n\n\n\n')
 
+        elif mess.startswith('$invite') and message.author.roles.count(CHAIR) > 0:
+            try:
+                memberMentioned = message.mentions[0]
+            except:
+                message.channel.send('Invalid Invitation because no one was found on $invite message')
+                return
+            voiceChannelList = message.guild.voice_channels
+            mainVoiceChannel = None
+            for i in voiceChannelList:
+                if i.name.upper() == message.channel.name.upper(): mainVoiceChannel = i
+            memberList = mainVoiceChannel.members
+            if memberMentioned in memberList:
+                pass
+            
+
+            
+            
+
+
+            
 
 @bot.event
 async def on_reaction_add(reaction, user):
-    roleList = reaction.message.guild.roles
+    try:
+        roleList = reaction.message.guild.roles
+    except Exception as e:
+        await reaction.message.channel.send('Something went wrong!')
+        return
     DEL = None
     CHAIR = None
     #print('Got an reaction from guild! ')
@@ -108,6 +181,7 @@ async def on_reaction_add(reaction, user):
         if i.name == '@delegate': DEL = i
         if i.name == '@chair': CHAIR = i
     del_Nums = len(DEL.members)
+    global isReplyTheRollCall
     #print('numbers of del: {}'.format(del_Nums))
 
     global voteNo,voteYes,voting_Count, whiteVote,raiseList
@@ -127,9 +201,9 @@ async def on_reaction_add(reaction, user):
         voting_Count += 1
     elif str(reaction.emoji) == '👍' and reaction.message == raiseMessage and user.roles.count(DEL) > 0:
         raiseList.append(user)
-
-    if voting_Count == del_Nums:
-        await reaction.message.channel.send('Numbers of agree: {}\nNumbes of disagree: {}\nNumbers of white-vote: {}'.format(voteYes,voteNo,whiteVote))
+    elif str(reaction.emoji) == '👍' and reaction.message == rollCallMessage and user == memberNeedtoReply:
+        isReplyTheRollCall = True
+        
 @bot.event
 async def on_reaction_remove(reaction,user):
     roleList = reaction.message.guild.roles
@@ -159,16 +233,5 @@ async def on_reaction_remove(reaction,user):
         raiseList.remove(user)
         ####################################
 
-
-
-@bot.event 
-async def on_member_join(member):
-    if len(member.role) == 0:
-        pass
-        #sent through bot TextChannel that something went wrong
-        
-# @bot.event
-# async def on_member_join(member):
-#         print(member.name)
 
 bot.run(token)
