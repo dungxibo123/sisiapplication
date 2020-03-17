@@ -1,14 +1,15 @@
 import discord
 import asyncio
-
-token = 'Njg4MzIyMDQxODM2NzMyNTY4.Xm87hA.QkYgsyYUGQ3dsxkCj9r1CggbItw'
+import data
+token = data.token
+nations = data.nations
 #Njg4MzIyMDQxODM2NzMyNTY4.Xm87hA.QkYgsyYUGQ3dsxkCj9r1CggbItw
 '''class MyClient inherit discord.Client create a connection to Bot and we
 can easily use Python to send command through discord Server'''
 bot = discord.Client()
-HPC = 688332663098048532
 
-COUNTRIES = ['VIETNAM', 'IRAQ'] 
+
+
 
 
 ##############################
@@ -34,7 +35,7 @@ isReplyTheRollCall = False   #
 
 
 def validCountry(country):
-    if COUNTRIES.count(country) > 0: return True
+    if nations.count(country) > 0: return True
     return False
 
 def setRegisterationResquest(message,country,role):
@@ -44,6 +45,9 @@ def setRegisterationResquest(message,country,role):
 @bot.event
 async def on_ready():
     print('Ok connected')
+
+
+
 
 @bot.event
 async def on_message(message):
@@ -125,7 +129,7 @@ async def on_message(message):
                 if i.name == '@delegate': DEL = i
                 if i.name == '@chair': CHAIR = i
             delList = DEL.members
-            chairList = CHAIR.members
+
             for i in delList:
                 memberNeedtoReply = i
                 await message.channel.send('$call {}. You have 5 seconds to react 👍 on this message'.format(i.mention))
@@ -150,19 +154,31 @@ async def on_message(message):
             try:
                 memberMentioned = message.mentions[0]
             except:
-                message.channel.send('Invalid Invitation because no one was found on $invite message')
-                return
+                await message.channel.send('Invalid Invitation because no one was found on $invite message')
+                return 
             voiceChannelList = message.guild.voice_channels
             mainVoiceChannel = None
             for i in voiceChannelList:
                 if i.name.upper() == message.channel.name.upper(): mainVoiceChannel = i
             memberList = mainVoiceChannel.members
             if memberMentioned in memberList:
-                pass
+                await memberMentioned.edit(mute = False, reason = None)
+        elif (mess.startswith('$over')  or mess.startswith('$muteall')) and  message.author.roles.count(CHAIR) > 0:
+            try:
+                await message.mentions[0].edit(mute = True, reason = None)
+                await message.channel.send('Over speech of {}'.format(message.mentions[0].nick))
+            except:
+                print('Mute all confirmed')
+                await message.channel.send('Mute all')
+                for member in message.guild.members:
+                    if member.roles.count(CHAIR) == 0:
+                        await member.edit(mute = True, reason = None)
+        
+                
             
 
             
-            
+           
 
 
             
@@ -171,16 +187,16 @@ async def on_message(message):
 async def on_reaction_add(reaction, user):
     try:
         roleList = reaction.message.guild.roles
-    except Exception as e:
+    except:
         await reaction.message.channel.send('Something went wrong!')
         return
     DEL = None
-    CHAIR = None
+#    CHAIR = None
     #print('Got an reaction from guild! ')
     for i in roleList:
         if i.name == '@delegate': DEL = i
-        if i.name == '@chair': CHAIR = i
-    del_Nums = len(DEL.members)
+#        if i.name == '@chair': CHAIR = i
+#    del_Nums = len(DEL.members)
     global isReplyTheRollCall
     #print('numbers of del: {}'.format(del_Nums))
 
@@ -211,7 +227,6 @@ async def on_reaction_remove(reaction,user):
     #print('Got an reaction from guild! ')
     for i in roleList:
         if i.name == '@delegate': DEL = i
-        if i.name == '@delegate': CHAIR = i
     #print('numbers of del: {}'.format(del_Nums))
 
     global voteNo,voteYes,voting_Count, whiteVote, raiseList

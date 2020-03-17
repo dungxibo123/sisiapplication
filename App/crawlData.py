@@ -19,9 +19,8 @@ for member in infoList:
 
 with open('nation.txt', 'w') as fp:
     for member in countryList:
-        fp.write('{}\n'.format(member))
+        fp.write('{}##'.format(member))
     
     
-
 
 
