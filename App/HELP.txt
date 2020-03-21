@@ -1,0 +1,52 @@
+HƯỚNG DẪN SỬ DỤNG BOT SISI
+(English version will be available soon)
+
+Danh sách các lệnh đối với chủ tọa (@chair):
+$rollcall - Dùng để điểm danh các đại biểu (@delegate) trong group
+$startraise [time] - (lưu ý không có cặp dấu [ ] nếu không có time thì thời gian tự động sẽ là 15 giây) - Ví dụ: $startraise 10
+$startvote - Bắt đầu một cuộc bỏ phiếu (chỉ có các @delegate được bỏ phiếu)
+$invite @[QUỐC GIA] - Cung cấp quyền nói cho một quốc gia (BOT sẽ tự động dừng tắt âm đại biểu (@delegate) đại diện cho quốc gia này) - Ví dụ: $invite @Viet Nam
+$over @{QUỐC GIA} - Tắt âm đại biểu (@delegate) đại diện cho quốc gia được nhắc tới - Ví dụ: $over @Viet Nam (thường là kết thúc phần phát biểu của đại biểu đến từ quốc gia hiện đang có quyền phát biểu)
+$muteall - Tắt âm tất cả các đại biểu (@delegate)
+
+$Danh sách các lệnh đối với đại biểu (@delegate):
+
+$regis->{QUỐC GIA} - Đăng ký mình với vai trò đại biểu đại diện cho {QUỐC GIA} - Ví dụ: $regis->Viet Nam
+
+<> Trong khi phần điểm danh diễn ra, hãy vui lòng chú ý tên nước mình có xuất hiện trong câu hay không. Nếu có hãy react (không biết dịch sao) thumbsup vào tin nhắn đó.
+<> Trong khi phần mời đại biểu quyết định có phát biểu hay không thì phải react thumbsup vào tin nhắn chứa câu lệnh '$startraise'
+<> Trong khi vote hãy react ::thumbsup:: nếu đồng ý, thumbsdown nếu không đồng ý và smileyface cho phiếu trống
+
+LƯU Ý:
+(-) Lệnh $help dành cho tất cả mọi người nhưng vì nội dung khá dài nên hãy vui lòng nhận file TXT. Và lưu ý, lệnh này chỉ có thể sử dụng trong kênh có tên 'bot'.
+(-) Chủ tọa sẽ được đặt vai trò thành chủ tọa bởi @admin (thường sẽ là anh Nghị) - mọi vấn đề vui lòng liên hệ anh Nghị
+(-) Đại biểu sẽ không được bất kỳ ai đặt vai trò ở hội nghị, hãy đảm bảo bạn đã đăng ký quốc gia mà bạn đại diện. SiSi sẽ đặt vai trò cho bạn trong server. Tên quốc gia này sẽ cùng đồng hành với bạn trong hội đồng trong suốt chiều dài hành trình với SIMUN.
+(-) Tên nước phải là tên được lấy từ bảng chính trong đường dẫn liên kết sau: https://en.wikipedia.org/wiki/Member_states_of_the_United_Nations (không chứa phần trong ngoặc đơn) - Ví dụ: Afghanistan (Islamic Republic of Afghanistan) sẽ là Afghanistan.
+
+
+SIMUN chân thành cảm ơn bạn đã đồng hành và hợp tác.
+
+BOT SISI INSTRUCTIONS FOR USE
+List of commands for chair (@chair):
+$rollcall - Used for delegate roll call in the groups
+$startraise {time} - (no {}; should the time not be inserted, it would be automatically set to 15 seconds)
+$startvote - Start a voting session (only @delegate can vote)
+$invite @{COUNTRY} - Call upon a delegate to make a speech (BOT will automatically unmute delegate (@delegate) of the recognised country - Example: $invite @Viet Nam
+$over @{COUNTRY} - Mute a delegate (@delegate) of inserted country - Example: $over @Viet Nam (Usually to end a previously recognised delegate's speech time)
+$muteall - mute all delegates (@delegate):
+
+
+List of commands for delegate:
+$regis->{COUNTRY} - Register role as delegate of {COUNTRY} - Example: $regis->Viet Nam
+<> During roll call session, find your assigned country's name on the message list, then react ::thumbsup:: to the text message.
+<> Should the delegate wish to speak, react ::thumbsup:: to the text message 'startraise' 
+<> During voting session, react ::thumbsup:: to vote in favour, ::thumbsdown:: to vote against and ::smileyface:: to abstain.
+
+
+NOTE:
+(-) $help command is for everyone. But, despite length of this resource, please get TXT Files through Platform. Intention: This command can only be used in channel named 'bot'
+(-) Chairs would be set role by @admin (which is taken up by Nghị) - should you have any problems, please contact Mr.Phạm Thái Nghị.
+(-) Since delegates will not be set role by either @admin or chairs, make sure you have registered your country in advance. You will then be connected to the server by BOT. Your role as delegate of the country will remain throughout the course of conference.
+(-) The country name must be present in the table at the following link:
+https://en.wikipedia.org/wiki/Member_states_of_the_United_Nations (not including the parenthetical remark) - Example: Afghanistan (Islamic Republic of Afghanistan) would become Afghanistan.
+We sincerely appreciate your companion and cooperation with SIMUN. 

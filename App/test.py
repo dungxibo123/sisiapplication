@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 import asyncio
 import data
 token = data.token
@@ -9,7 +10,7 @@ can easily use Python to send command through discord Server'''
 bot = discord.Client()
 
 
-
+embed = discord.Embed(colour = discord.Colour.gold())
 
 
 ##############################
@@ -51,23 +52,32 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    print(message.content   )
+    print(message.content)
     global voting_Count,voteNo,voteYes,messageNeedToVote
-    mess = message.content  
+    mess = message.content
     roleList = message.guild.roles
     DEL = None
     CHAIR = None
-    
+
     for i in roleList:
         if i.name == '@delegate': DEL = i
         if i.name == '@chair': CHAIR = i
     del_Nums = len(DEL.members)
-    
-    if mess.startswith('$'):
+    global embed
+    if message.channel.name != 'bot':
+        if mess.startswith('$helloSiSi'):
+
+            embed.title = 'Hello, I\'m SiSi. You guys can look me like an admin of this commitee :))))\n Hope we can effective interact with each other'
+            await message.channel.send(content = None,embed = embed)
+            await asyncio.sleep(1.23456)
+            files = [discord.File('HELP.txt')]
+            embed.title = 'Please read the following files!'
+            await message.channel.send(content = None, files = files,embed = embed)
+
         ######################################################################################
-        if mess.startswith('$regis'):
+        elif mess.startswith('$regis'):
             try:
-                country = mess.split(' ')[1].upper()
+                country = mess.split('->')[1].upper()
                 if validCountry(country):
                     member = message.author
                     if member.roles.count(DEL) > 0:
@@ -75,7 +85,7 @@ async def on_message(message):
                     else:
                         await member.edit(nick = country,roles = [DEL], reason = None)
                         await message.channel.send('Succesfully registered as {}'.format(country))
-                        
+
 
             except Exception as e:
                 await message.channel.send('Invalid Country or Invalid Guild\'s Input')
@@ -100,7 +110,7 @@ async def on_message(message):
             for i in raiseList:
                 notification += '\n{}'.format(i.mention)
             await message.channel.send(notification)
-            
+
         ######################################################################################
         elif mess.startswith('$startvote') and message.author.roles.count(CHAIR) > 0:
             voteYes = 0
@@ -120,6 +130,7 @@ async def on_message(message):
         ######################################################################################
         elif mess.startswith('$rollcall') and message.author.roles.count(CHAIR) > 0:
             global memberNeedtoReply,rollCallMessage, isReplyTheRollCall
+            rollCallMessage = None
             roleList = message.guild.roles
             DEL = None
             CHAIR = None
@@ -139,7 +150,7 @@ async def on_message(message):
                 else:
                     absentList.append(i)
                 isReplyTheRollCall = False
-   
+
             roll = 'Absent delegate(s):'
             for i in absentList: roll += '\n{}'.format(i.mention)
             roll+='\nOnline delegate(s):'
@@ -155,7 +166,7 @@ async def on_message(message):
                 memberMentioned = message.mentions[0]
             except:
                 await message.channel.send('Invalid Invitation because no one was found on $invite message')
-                return 
+                return
             voiceChannelList = message.guild.voice_channels
             mainVoiceChannel = None
             for i in voiceChannelList:
@@ -173,15 +184,17 @@ async def on_message(message):
                 for member in message.guild.members:
                     if member.roles.count(CHAIR) == 0:
                         await member.edit(mute = True, reason = None)
-        
-                
-            
 
-            
-           
+    elif mess.startswith('$help'):
+
+        embed.title = 'Please received Introduction TXT Files'
+        file = [discord.File('HELP.txt')]
+        await message.channel.send(content = None, files = file ,embed = embed)
+    elif mess.startswith('$guildid'):
+        print('success')
+        await message.channel.send('{}'.format(message.guild.id))
 
 
-            
 
 @bot.event
 async def on_reaction_add(reaction, user):
@@ -203,7 +216,7 @@ async def on_reaction_add(reaction, user):
     global voteNo,voteYes,voting_Count, whiteVote,raiseList
 
     #print(messageNeedToVote, str(reaction.emoji))
-    #print(str(reaction.emoji) == '👍') 
+    #print(str(reaction.emoji) == '👍')
     if  str(reaction.emoji) == '👍' and reaction.message == messageNeedToVote and user.roles.count(DEL) > 0:
         #print(1111)
         voteYes += 1
@@ -219,7 +232,12 @@ async def on_reaction_add(reaction, user):
         raiseList.append(user)
     elif str(reaction.emoji) == '👍' and reaction.message == rollCallMessage and user == memberNeedtoReply:
         isReplyTheRollCall = True
-        
+
+# @bot.command(pass_context = True)
+# async def join(ctx):
+#     channel = ctx.message.author.voice.voice_channel
+#     await bot.join_voice_channel(channel)
+
 @bot.event
 async def on_reaction_remove(reaction,user):
     roleList = reaction.message.guild.roles
@@ -232,7 +250,7 @@ async def on_reaction_remove(reaction,user):
     global voteNo,voteYes,voting_Count, whiteVote, raiseList
 
     #print(messageNeedToVote, str(reaction.emoji))
-    #print(str(reaction.emoji) == '👍') 
+    #print(str(reaction.emoji) == '👍')
     if  str(reaction.emoji) == '👍' and reaction.message == messageNeedToVote and user.roles.count(DEL) > 0:
         #print(1111)
         voteYes -= 1
