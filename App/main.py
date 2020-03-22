@@ -9,6 +9,12 @@ commiteeDict = {}
 async def on_message(message):
     print(message.content)
     mess = message.content
+    if message.channel.name.upper() == 'BOT' and mess.startswith('$help'):
+            await asyncio.sleep(1.23456)
+            files = [discord.File('HELP.txt')]
+            embed.title = 'Please read the following files!'
+            await message.channel.send(content = None, files = files,embed = embed)
+            return
     if not message.channel.name.upper() in commiteeDict.keys():
         newCom = commitee(message.channel.name.upper(), message.guild)
         temp = {message.channel.name.upper(): newCom}
@@ -39,11 +45,6 @@ async def on_message(message):
 
         elif (mess.startswith('$over')  or mess.startswith('$muteall')) and  message.author.roles.count(chair) > 0:
             await com.muteall(message)
-
-    elif mess.startswith('$help'):
-        pass
-    elif mess.startswith('$guildid'):
-        pass
 @bot.event
 async def on_ready():
     print('Ok connected')
