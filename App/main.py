@@ -5,47 +5,54 @@ token = data.token
 bot = commands.Bot(command_prefix = '$')
 
 commiteeDict = {}
+@bot.event
+async def on_message(message):
+    print(message.content)
+    mess = message.content
+    if not message.channel.name.upper() in commiteeDict.keys():
+        newCom = commitee(message.channel.name.upper(), message.guild)
+        temp = {message.channel.name.upper(): newCom}
+        commiteeDict.update(temp)
+    if message.channel.name.upper() in commiteeDict.keys():
+        com = commiteeDict[message.channel.name.upper()]
+        dele, chair, admin = com.getRoleList()
 
-@bot.command(pass_context = True)
-async def hello(ctx):
-    if ctx.message.channel.name.upper() in commiteeDict.keys():
-        print('ok')
-        await commiteeDict[ctx.message.channel.name.upper()].hello(ctx.message)
-    else:
-        newCommitee = commitee(ctx.message.channel.name.upper(), ctx.message.guild)
-        commiteeDict.update({ctx.message.channel.name.upper(): newCommitee})
-        print('ok')
-        await commiteeDict[ctx.message.channel.name.upper()].hello(ctx.message)
-@bot.command(pass_context = True)
-async def regis(ctx):
-    if ctx.message.channel.name.upper() in commiteeDict.keys():
-        await commiteeDict[ctx.message.channel.name.upper()].register(ctx.message)
+        if mess.startswith('$hello') and admin in message.author.roles:
+            await com.hello(message)
+        ######################################################################################
+        elif mess.startswith('$regis') and dele in message.author.roles:
+            await com.register(message)
 
-@bot.command(pass_context = True)
-async def rollcall(ctx):
-    if ctx.message.channel.name.upper() in commiteeDict.keys():
-        await commiteeDict[ctx.message.channel.name.upper()].rollcall(ctx.message)
+        elif mess.startswith('$startraise') and message.author.roles.count(chair) > 0:
+            await com.startraise(message)
+        ######################################################################################
+        elif mess.startswith('$startvote') and message.author.roles.count(chair) > 0:
+            await com.startvote(message)
+        ######################################################################################
+        elif mess.startswith('$rollcall') and message.author.roles.count(chair) > 0:
+            await com.rollcall(message)
+        elif mess.startswith('$call'):
+            com.setRollCallMessage(message)
 
-@bot.command(pass_context = True)
-async def startvote(ctx):
-    if ctx.message.channel.name.upper() in commiteeDict.keys():
-        await commiteeDict[ctx.message.channel.name.upper()].startvote(ctx.message)
-@bot.command(pass_context = True)
-async def startraise(ctx):
-    if ctx.message.channel.name.upper() in commiteeDict.keys():
-        await commiteeDict[ctx.message.channel.name.upper()].startraise(ctx.message)
+        elif mess.startswith('$invite') and message.author.roles.count(chair) > 0:
+            await com.invite(message)
 
-@bot.command(pass_context = True)
-async def call(ctx):
-    print(ctx.message.content)
-    #if ctx.message.channel.name.upper() in commiteeDict.keys():
-    #    commiteeDict[ctx.message.channel.name.upper()].rollCallMessage = ctx.message
+        elif (mess.startswith('$over')  or mess.startswith('$muteall')) and  message.author.roles.count(chair) > 0:
+            await com.muteall(message)
+
+    elif mess.startswith('$help'):
+        pass
+    elif mess.startswith('$guildid'):
+        pass
 @bot.event
 async def on_ready():
     print('Ok connected')
-
+# @bot.event
+# async def on_message(message):
+#     print(message.content)
 @bot.event
 async def on_reaction_add(reaction, user):
+    print('Found 1 reactaion add')
     try:
         roleList = reaction.message.guild.roles
     except:
@@ -72,6 +79,7 @@ async def on_reaction_add(reaction, user):
         com.whiteVote += 1
         com.voting_Count += 1
     elif str(reaction.emoji) == '👍' and reaction.message == com.raiseMessage and user.roles.count(dele) > 0:
+        print('Found 1 want to raise')
         com.raiseList.append(user)
     elif str(reaction.emoji) == '👍' and reaction.message == com.rollCallMessage and user == com.memberNeedtoReply:
         com.isReplyTheRollCall = True

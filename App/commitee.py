@@ -35,7 +35,16 @@ class Commitee:
             if i.name == '@chair': chair = i
             if i.name == '@admin': admin = i
         return dele,chair, admin
-
+    def setRollCallMessage(self, message):
+        self.rollCallMessage = message
+    def setupVoting(self):
+        self.voteYes = 0
+        self.voteNo = 0
+        self.whiteVote = 0
+        self.voting_Count = 0
+        self.messageNeedToVote = message
+    def setRaiseMessage(self, message):
+        self.raiseMessage = message
     async def hello(self, message):
         dele, chair, admin = self.getRoleList()
         if admin in message.author.roles:
@@ -84,13 +93,14 @@ class Commitee:
         for i in onlineList: roll += '\n{}'.format(i.mention)
         print(roll)
         await message.channel.send(roll)
-    async def startvote(self, message):
+    async def startraise(self, message):
         dele, chair, admin = self.getRoleList()
         if chair in message.author.roles and not dele in message.author.roles:
             print('Update message to raising hand')
 #            global raiseList
             self.raiseList = []
             time = 30
+            self.setRaiseMessage(message)
             try:
                 time = float(mess.split(' ')[1])
                 await message.channel.send('You got {} seconds to raise your hand by reacting 👍 to $startraise message', time)
@@ -98,20 +108,16 @@ class Commitee:
                 await message.channel.send('Error with time, automatic time is 15 seconds to raise your hand by reacting 👍 to $startraise message')
                 time = 15
 #            global raiseMessage
-            self.raiseMessage = message
+
             await asyncio.sleep(time)
-            notification = 'Numbers of Delegates want to raise hand: {}'.format(len(raiseList))
+            notification = 'Numbers of Delegates want to raise hand: {}'.format(len(self.raiseList))
             for i in self.raiseList:
                 notification += '\n{}'.format(i.mention)
             await message.channel.send(notification)
-    async def startraise(self,message):
+    async def startvote(self,message):
         dele, chair, admin = self.getRoleList()
         if chair in message.author.roles and not dele in message.author.roles:
-            self.voteYes = 0
-            self.voteNo = 0
-            self.whiteVote = 0
-            self.voting_Count = 0
-            self.messageNeedToVote = message
+            self.setupVoting()
             print('Update new message that need to vote')
             try:
                 time = float(mess.split(' ')[1])
@@ -145,5 +151,5 @@ class Commitee:
                 print('Mute all confirmed')
                 await message.channel.send('Mute all')
                 for member in message.guild.members:
-                    if member.roles.count(CHAIR) == 0:
+                    if member.roles.count(chair) == 0:
                         await member.edit(mute = True, reason = None)
